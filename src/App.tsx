@@ -145,7 +145,7 @@ const App = () => {
       {selectedImage && !loading && (
         <div
           className="relative h-3/4 flex justify-center"
-          style={{ width: imageWidth ?? "100%" }}
+          style={{ width: imageWidth ? imageWidth : "100%" }}
           onMouseOver={() => setImageWidth(imageRef.current?.offsetWidth)}
         >
           <button

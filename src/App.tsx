@@ -8,6 +8,7 @@ import insta from "./assets/insta.json";
 import Camera from "react-html5-camera-photo";
 import "react-html5-camera-photo/build/css/index.css";
 import { useEffect, useRef, useState } from "react";
+import { getImagePrediction } from "./api";
 
 const App = () => {
   const folderRef = useRef<any>();
@@ -59,6 +60,18 @@ const App = () => {
     if (files && files.length) {
       setSelectedImage(URL.createObjectURL(files[files.length - 1]));
     }
+  };
+
+  const predictImage = async () => {
+    setLoading(true);
+
+    try {
+      getImagePrediction(selectedImage);
+    } catch (error: any) {
+      console.error(error.message);
+    }
+
+    setLoading(false);
   };
 
   return (
@@ -201,7 +214,7 @@ const App = () => {
           />
           <button
             className="absolute bottom-0 h-4/5 w-full bg-primary opacity-0 hover:opacity-100 bg-opacity-30 transition-all duration-200"
-            onClick={() => setLoading(true)}
+            onClick={predictImage}
           >
             <Player
               autoplay

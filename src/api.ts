@@ -1,14 +1,14 @@
 import axios from "axios";
 
-const baseUrl = "http://localhost:8000/";
+const baseUrl = "http://localhost:8000";
 
 export const getImagePrediction = async (image: any) => {
-  const imageFile = new File([image], "image");
-
   try {
-    const response = await axios.post(baseUrl + "predict", {
-      img: imageFile,
-    });
+    const formData = new FormData();
+
+    formData.append("img", image);
+
+    const response = await axios.post(`${baseUrl}/predict`, formData);
 
     return response.data.prediction;
   } catch (error) {

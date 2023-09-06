@@ -48,8 +48,6 @@ const App = () => {
   };
 
   const handleDrop = (event: any) => {
-    console.log("Drop");
-
     event.preventDefault();
     event.stopPropagation();
 
@@ -58,7 +56,7 @@ const App = () => {
     const { files } = event.dataTransfer;
 
     if (files && files.length) {
-      setSelectedImage(URL.createObjectURL(files[files.length - 1]));
+      setSelectedImage(files[files.length - 1]);
     }
   };
 
@@ -66,7 +64,8 @@ const App = () => {
     setLoading(true);
 
     try {
-      getImagePrediction(selectedImage);
+      const response = await getImagePrediction(selectedImage);
+      alert(response);
     } catch (error: any) {
       console.error(error.message);
     }
@@ -156,11 +155,9 @@ const App = () => {
             onChange={(event) =>
               setSelectedImage(
                 event.currentTarget.files
-                  ? URL.createObjectURL(
-                      event.currentTarget.files[
-                        event.currentTarget.files.length - 1
-                      ]
-                    )
+                  ? event.currentTarget.files[
+                      event.currentTarget.files.length - 1
+                    ]
                   : undefined
               )
             }
@@ -209,7 +206,7 @@ const App = () => {
           <img
             ref={imageRef}
             className="h-full"
-            src={selectedImage}
+            src={URL.createObjectURL(selectedImage)}
             alt="Selected Image"
           />
           <button

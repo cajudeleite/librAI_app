@@ -4,6 +4,9 @@ import airplay from "./assets/airplay.json";
 import check from "./assets/check.json";
 import error from "./assets/error.json";
 import loadingLottie from "./assets/loading.json";
+import insta from "./assets/insta.json";
+import Camera from "react-html5-camera-photo";
+import "react-html5-camera-photo/build/css/index.css";
 import { useEffect, useRef, useState } from "react";
 
 const App = () => {
@@ -11,10 +14,12 @@ const App = () => {
   const airplayRef = useRef<any>();
   const inputRef = useRef<any>();
   const imageRef = useRef<any>();
+  const instaRef = useRef<any>();
   const [selectedImage, setSelectedImage] = useState<any>();
   const [dragActive, setDragActive] = useState(false);
-  const [imageWidth, setImageWidth] = useState<number | null>(null);
+  const [containerWidth, setContainerWidth] = useState<number | null>(null);
   const [loading, setLoading] = useState(false);
+  const [showCamera, setShowCamera] = useState(false);
 
   useEffect(() => {
     setInterval(() => {
@@ -66,20 +71,46 @@ const App = () => {
         dragActive ? "bg-background-dark" : "bg-background-light"
       }`}
     >
-      {!selectedImage && !loading && (
+      {!selectedImage && !loading && !showCamera && (
         <>
           <Player
             ref={airplayRef}
             speed={0.7}
             src={airplay}
-            style={{ height: "10vw", width: "10vw" }}
+            className="h-[10vw] w-[10vw] hidden lg:block"
           />
+          <div
+            onMouseEnter={() => {
+              instaRef.current.setPlayerDirection(1);
+              instaRef.current.play();
+            }}
+            onMouseLeave={() => {
+              instaRef.current.setPlayerDirection(-1);
+              instaRef.current.play();
+            }}
+            onClick={() => setShowCamera(true)}
+            className="cursor-pointer"
+          >
+            <Player
+              ref={instaRef}
+              keepLastFrame
+              src={insta}
+              className="h-[10vw] w-[10vw] lg:hidden"
+            />
+          </div>
           <p
-            className={`text-[1vw] ${
+            className={`text-[2.5vw] lg:text-[1vw] hidden lg:block ${
               dragActive ? "text-white" : "text-secondary"
             }`}
           >
             Drop your picture
+          </p>
+          <p
+            className={`text-[2.5vw] lg:text-[1vw] lg:hidden ${
+              dragActive ? "text-white" : "text-secondary"
+            }`}
+          >
+            Take a picture
           </p>
           <div
             className={`w-full flex justify-center items-center space-x-2 ${
@@ -91,7 +122,7 @@ const App = () => {
                 dragActive ? "bg-background-light" : "bg-background-dark"
               }`}
             />
-            <p className="text-[1vw]">or</p>
+            <p className="text-[2.5vw] lg:text-[1vw]">or</p>
             <div
               className={`h-[2px] w-1/5 ${
                 dragActive ? "bg-background-light" : "bg-background-dark"
@@ -99,7 +130,7 @@ const App = () => {
             />
           </div>
           <p
-            className={`text-[1vw] ${
+            className={`text-[2.5vw] lg:text-[1vw] ${
               dragActive ? "text-white" : "text-secondary"
             }`}
           >
@@ -137,7 +168,7 @@ const App = () => {
               ref={folderRef}
               keepLastFrame
               src={folder}
-              style={{ height: "10vw", width: "10vw" }}
+              className="h-[10vw] w-[10vw]"
             />
           </div>
         </>
@@ -145,12 +176,15 @@ const App = () => {
       {selectedImage && !loading && (
         <div
           className="relative h-3/4 flex justify-center"
-          style={{ width: imageWidth ?? "100%" }}
-          onMouseOver={() => setImageWidth(imageRef.current?.offsetWidth)}
+          style={{ width: containerWidth ? containerWidth : "100%" }}
+          onMouseOver={() => setContainerWidth(imageRef.current?.offsetWidth)}
         >
           <button
             className="absolute h-1/5 w-full bg-red-500 opacity-0 hover:opacity-100 bg-opacity-30 transition-all duration-200"
-            onClick={() => setSelectedImage(null)}
+            onClick={() => {
+              setSelectedImage(null);
+              setContainerWidth(null);
+            }}
           >
             <Player
               autoplay
@@ -185,6 +219,41 @@ const App = () => {
           src={loadingLottie}
           style={{ height: "15vw", width: "15vw" }}
         />
+      )}
+      {showCamera && (
+        <div
+          className="relative flex justify-center"
+          style={{ width: containerWidth ? containerWidth : "100%" }}
+          onMouseOver={() =>
+            setContainerWidth(
+              document.getElementsByClassName("react-html5-camera-photo")[0]
+                .clientWidth
+            )
+          }
+        >
+          <button
+            className="absolute z-20 h-1/5 w-full bg-red-500 opacity-0 hover:opacity-100 bg-opacity-30 transition-all duration-200"
+            onClick={() => {
+              setShowCamera(false);
+              setContainerWidth(null);
+            }}
+          >
+            <Player
+              autoplay
+              loop
+              src={error}
+              style={{ height: "auto", width: "15%" }}
+            />
+          </button>
+          <Camera
+            isImageMirror
+            onTakePhotoAnimationDone={(dataUri) => {
+              setContainerWidth(null);
+              setSelectedImage(dataUri);
+              setShowCamera(false);
+            }}
+          />
+        </div>
       )}
     </div>
   );

@@ -8,6 +8,7 @@ import insta from "./assets/insta.json";
 import Camera from "react-html5-camera-photo";
 import "react-html5-camera-photo/build/css/index.css";
 import { useEffect, useRef, useState } from "react";
+import { getImagePrediction } from "./api";
 
 const App = () => {
   const folderRef = useRef<any>();
@@ -47,8 +48,6 @@ const App = () => {
   };
 
   const handleDrop = (event: any) => {
-    console.log("Drop");
-
     event.preventDefault();
     event.stopPropagation();
 
@@ -57,8 +56,21 @@ const App = () => {
     const { files } = event.dataTransfer;
 
     if (files && files.length) {
-      setSelectedImage(URL.createObjectURL(files[files.length - 1]));
+      setSelectedImage(files[files.length - 1]);
     }
+  };
+
+  const predictImage = async () => {
+    setLoading(true);
+
+    try {
+      const response = await getImagePrediction(selectedImage);
+      alert(response);
+    } catch (error: any) {
+      console.error(error.message);
+    }
+
+    setLoading(false);
   };
 
   return (
@@ -143,11 +155,9 @@ const App = () => {
             onChange={(event) =>
               setSelectedImage(
                 event.currentTarget.files
-                  ? URL.createObjectURL(
-                      event.currentTarget.files[
-                        event.currentTarget.files.length - 1
-                      ]
-                    )
+                  ? event.currentTarget.files[
+                      event.currentTarget.files.length - 1
+                    ]
                   : undefined
               )
             }
@@ -196,12 +206,12 @@ const App = () => {
           <img
             ref={imageRef}
             className="h-full"
-            src={selectedImage}
+            src={URL.createObjectURL(selectedImage)}
             alt="Selected Image"
           />
           <button
             className="absolute bottom-0 h-4/5 w-full bg-primary opacity-0 hover:opacity-100 bg-opacity-30 transition-all duration-200"
-            onClick={() => setLoading(true)}
+            onClick={predictImage}
           >
             <Player
               autoplay

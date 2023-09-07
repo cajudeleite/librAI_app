@@ -21,6 +21,7 @@ const App = () => {
   const [containerWidth, setContainerWidth] = useState<number | null>(null);
   const [loading, setLoading] = useState(false);
   const [showCamera, setShowCamera] = useState(false);
+  const [prediction, setPrediction] = useState("");
 
   useEffect(() => {
     setInterval(() => {
@@ -65,7 +66,8 @@ const App = () => {
 
     try {
       const response = await getImagePrediction(selectedImage);
-      alert(response);
+
+      setPrediction(response);
     } catch (error: any) {
       console.error(error.message);
     }
@@ -194,14 +196,10 @@ const App = () => {
             onClick={() => {
               setSelectedImage(null);
               setContainerWidth(null);
+              setPrediction("");
             }}
           >
-            <Player
-              autoplay
-              loop
-              src={error}
-              style={{ height: "auto", width: "15%" }}
-            />
+            <Player autoplay loop src={error} style={{ width: "11%" }} />
           </button>
           <img
             ref={imageRef}
@@ -209,17 +207,18 @@ const App = () => {
             src={URL.createObjectURL(selectedImage)}
             alt="Selected Image"
           />
-          <button
-            className="absolute bottom-0 h-4/5 w-full bg-primary opacity-0 hover:opacity-100 bg-opacity-30 transition-all duration-200"
-            onClick={predictImage}
-          >
-            <Player
-              autoplay
-              loop
-              src={check}
-              style={{ height: "auto", width: "30%" }}
-            />
-          </button>
+          {prediction ? (
+            <div className="absolute bottom-0 h-4/5 w-full bg-primary bg-opacity-30 flex justify-center items-center">
+              <p className="text-primary-500 text-[7vw]">{prediction}</p>
+            </div>
+          ) : (
+            <button
+              className="absolute bottom-0 h-4/5 w-full bg-primary opacity-0 hover:opacity-100 bg-opacity-30 transition-all duration-200"
+              onClick={predictImage}
+            >
+              <Player autoplay loop src={check} style={{ width: "30%" }} />
+            </button>
+          )}
         </div>
       )}
       {loading && (

@@ -227,7 +227,6 @@ const App = () => {
             <button
               className="absolute bottom-0 h-4/5 w-full bg-primary opacity-0 hover:opacity-100 bg-opacity-30 transition-all duration-200"
               onClick={predictImage}
-              onTouchStart={predictImage}
             >
               <Player autoplay loop src={check} style={{ width: "30%" }} />
             </button>

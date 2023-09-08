@@ -1,6 +1,6 @@
 import axios from "axios";
 
-const baseUrl = "http://localhost:8000";
+const baseUrl = "http://34.76.40.97:8000";
 
 export const getImagePrediction = async (image: any) => {
   try {

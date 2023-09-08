@@ -8,6 +8,7 @@ import insta from "./assets/insta.json";
 import Camera from "react-html5-camera-photo";
 import "react-html5-camera-photo/build/css/index.css";
 import { useEffect, useRef, useState } from "react";
+import { getImagePrediction } from "./api";
 
 const App = () => {
   const folderRef = useRef<any>();
@@ -20,6 +21,7 @@ const App = () => {
   const [containerWidth, setContainerWidth] = useState<number | null>(null);
   const [loading, setLoading] = useState(false);
   const [showCamera, setShowCamera] = useState(false);
+  const [prediction, setPrediction] = useState("");
 
   useEffect(() => {
     setInterval(() => {
@@ -47,8 +49,6 @@ const App = () => {
   };
 
   const handleDrop = (event: any) => {
-    console.log("Drop");
-
     event.preventDefault();
     event.stopPropagation();
 
@@ -57,8 +57,34 @@ const App = () => {
     const { files } = event.dataTransfer;
 
     if (files && files.length) {
-      setSelectedImage(URL.createObjectURL(files[files.length - 1]));
+      setSelectedImage(files[files.length - 1]);
     }
+  };
+
+  const predictImage = async () => {
+    setLoading(true);
+
+    try {
+      const response = await getImagePrediction(selectedImage);
+
+      setPrediction(response);
+    } catch (error: any) {
+      console.error(error.message);
+    }
+
+    setLoading(false);
+  };
+
+  const dataURLtoFile = (dataurl: any, filename: string) => {
+    var arr = dataurl.split(","),
+      mime = arr[0].match(/:(.*?);/)[1],
+      bstr = atob(arr[arr.length - 1]),
+      n = bstr.length,
+      u8arr = new Uint8Array(n);
+    while (n--) {
+      u8arr[n] = bstr.charCodeAt(n);
+    }
+    return new File([u8arr], filename, { type: mime });
   };
 
   return (
@@ -143,11 +169,9 @@ const App = () => {
             onChange={(event) =>
               setSelectedImage(
                 event.currentTarget.files
-                  ? URL.createObjectURL(
-                      event.currentTarget.files[
-                        event.currentTarget.files.length - 1
-                      ]
-                    )
+                  ? event.currentTarget.files[
+                      event.currentTarget.files.length - 1
+                    ]
                   : undefined
               )
             }
@@ -184,32 +208,29 @@ const App = () => {
             onClick={() => {
               setSelectedImage(null);
               setContainerWidth(null);
+              setPrediction("");
             }}
           >
-            <Player
-              autoplay
-              loop
-              src={error}
-              style={{ height: "auto", width: "15%" }}
-            />
+            <Player autoplay loop src={error} style={{ width: "11%" }} />
           </button>
           <img
             ref={imageRef}
             className="h-full"
-            src={selectedImage}
+            src={URL.createObjectURL(selectedImage)}
             alt="Selected Image"
           />
-          <button
-            className="absolute bottom-0 h-4/5 w-full bg-primary opacity-0 hover:opacity-100 bg-opacity-30 transition-all duration-200"
-            onClick={() => setLoading(true)}
-          >
-            <Player
-              autoplay
-              loop
-              src={check}
-              style={{ height: "auto", width: "30%" }}
-            />
-          </button>
+          {prediction ? (
+            <div className="absolute bottom-0 h-4/5 w-full bg-primary bg-opacity-30 flex justify-center items-center">
+              <p className="text-primary-500 text-[7vw]">{prediction}</p>
+            </div>
+          ) : (
+            <button
+              className="absolute bottom-0 h-4/5 w-full bg-primary opacity-0 hover:opacity-100 bg-opacity-30 transition-all duration-200"
+              onClick={predictImage}
+            >
+              <Player autoplay loop src={check} style={{ width: "30%" }} />
+            </button>
+          )}
         </div>
       )}
       {loading && (
@@ -248,8 +269,10 @@ const App = () => {
           <Camera
             isImageMirror
             onTakePhotoAnimationDone={(dataUri) => {
+              const imgFile = dataURLtoFile(dataUri, "photo.jpeg");
+
               setContainerWidth(null);
-              setSelectedImage(dataUri);
+              setSelectedImage(imgFile);
               setShowCamera(false);
             }}
           />

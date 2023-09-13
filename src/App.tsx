@@ -18,6 +18,7 @@ const App = () => {
   const imageRef = useRef<any>();
   const instaRef = useRef<any>();
   const logoRef = useRef<any>();
+  const absoluteLogoRef = useRef<any>();
   const containerRef = useRef<any>();
   const [selectedImage, setSelectedImage] = useState<any>();
   const [dragActive, setDragActive] = useState(false);
@@ -28,10 +29,16 @@ const App = () => {
 
   useEffect(() => {
     containerRef.current.classList.add("hidden");
+    absoluteLogoRef.current.classList.add("hidden");
 
     setTimeout(() => {
-      logoRef.current.classList.add("slide-out-blurred-top");
+      logoRef.current.classList.add("slide-out-blurred-tl");
     }, 3000);
+
+    setTimeout(() => {
+      absoluteLogoRef.current.classList.remove("hidden");
+      absoluteLogoRef.current.classList.add("slide-in-blurred-br");
+    }, 3500);
 
     setTimeout(() => {
       logoRef.current.classList.add("hidden");
@@ -41,6 +48,7 @@ const App = () => {
 
     setTimeout(() => {
       containerRef.current.classList.remove("puff-in-center");
+      absoluteLogoRef.current.classList.remove("slide-in-blurred-br");
     }, 5000);
   }, []);
 
@@ -112,10 +120,15 @@ const App = () => {
         dragActive ? "bg-background-dark" : "bg-background-light"
       }`}
     >
+      <div
+        className="absolute top-8 left-8 w-1/6 lg:w-1/12"
+        ref={absoluteLogoRef}
+      >
+        <Logo />
+      </div>
       <div className="w-1/3 slide-in-blurred-bottom" ref={logoRef}>
         <Logo />
       </div>
-
       {!selectedImage && !loading && !showCamera && (
         <div
           className="w-full h-full flex flex-col justify-center items-center space-y-4"

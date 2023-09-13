@@ -1,14 +1,15 @@
 import { Player } from "@lottiefiles/react-lottie-player";
-import folder from "./assets/folder.json";
-import airplay from "./assets/airplay.json";
-import check from "./assets/check.json";
-import error from "./assets/error.json";
-import loadingLottie from "./assets/loading.json";
-import insta from "./assets/insta.json";
+import folder from "./assets/lotties/folder.json";
+import airplay from "./assets/lotties/airplay.json";
+import check from "./assets/lotties/check.json";
+import error from "./assets/lotties/error.json";
+import loadingLottie from "./assets/lotties/loading.json";
+import insta from "./assets/lotties/insta.json";
 import Camera from "react-html5-camera-photo";
 import "react-html5-camera-photo/build/css/index.css";
 import { useEffect, useRef, useState } from "react";
 import { getImagePrediction } from "./api";
+import Logo from "./assets/icons/Logo";
 
 const App = () => {
   const folderRef = useRef<any>();
@@ -16,6 +17,8 @@ const App = () => {
   const inputRef = useRef<any>();
   const imageRef = useRef<any>();
   const instaRef = useRef<any>();
+  const logoRef = useRef<any>();
+  const containerRef = useRef<any>();
   const [selectedImage, setSelectedImage] = useState<any>();
   const [dragActive, setDragActive] = useState(false);
   const [containerWidth, setContainerWidth] = useState<number | null>(null);
@@ -24,9 +27,21 @@ const App = () => {
   const [prediction, setPrediction] = useState("");
 
   useEffect(() => {
-    setInterval(() => {
-      airplayRef.current?.play();
-    }, 1000);
+    containerRef.current.classList.add("hidden");
+
+    setTimeout(() => {
+      logoRef.current.classList.add("slide-out-blurred-top");
+    }, 3000);
+
+    setTimeout(() => {
+      logoRef.current.classList.add("hidden");
+      containerRef.current.classList.remove("hidden");
+      containerRef.current.classList.add("puff-in-center");
+    }, 3750);
+
+    setTimeout(() => {
+      containerRef.current.classList.remove("puff-in-center");
+    }, 5000);
   }, []);
 
   const handleDragOver = (event: any) => {
@@ -93,12 +108,19 @@ const App = () => {
       onDragEnter={handleDragEnter}
       onDragLeave={handleDragLeave}
       onDrop={handleDrop}
-      className={`h-screen w-screen flex flex-col justify-center items-center space-y-4 ${
+      className={`h-screen w-screen overflow-hidden flex justify-center items-center ${
         dragActive ? "bg-background-dark" : "bg-background-light"
       }`}
     >
+      <div className="w-1/3 slide-in-blurred-bottom" ref={logoRef}>
+        <Logo />
+      </div>
+
       {!selectedImage && !loading && !showCamera && (
-        <>
+        <div
+          className="w-full h-full flex flex-col justify-center items-center space-y-4"
+          ref={containerRef}
+        >
           <Player
             ref={airplayRef}
             speed={0.7}
@@ -195,7 +217,7 @@ const App = () => {
               className="h-[10vw] w-[10vw]"
             />
           </div>
-        </>
+        </div>
       )}
       {selectedImage && !loading && (
         <div

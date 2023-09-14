@@ -258,13 +258,13 @@ const App = () => {
             <div className="absolute bottom-0 h-4/5 w-full bg-primary bg-opacity-30 flex justify-center items-center space-x-4">
               {prediction.length === 3 ? (
                 <>
-                  <p className="text-primary-500 text-[5vw] translate-y-16">
+                  <p className="text-primary-500 text-[5vw] translate-y-8 lg:translate-y-16">
                     {prediction[1]}
                   </p>
                   <p className="text-primary-500 text-[7vw] font-bold">
                     {prediction[0]}
                   </p>
-                  <p className="text-primary-500 text-[5vw] translate-y-16">
+                  <p className="text-primary-500 text-[5vw] translate-y-8 lg:translate-y-16">
                     {prediction[2]}
                   </p>
                 </>

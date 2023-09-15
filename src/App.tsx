@@ -50,6 +50,10 @@ const App = () => {
       containerRef.current.classList.remove("puff-in-center");
       absoluteLogoRef.current.classList.remove("slide-in-blurred-br");
     }, 5000);
+
+    setInterval(() => {
+      airplayRef.current?.play();
+    }, 1000);
   }, []);
 
   const handleDragOver = (event: any) => {
@@ -149,7 +153,11 @@ const App = () => {
               instaRef.current.setPlayerDirection(-1);
               instaRef.current.play();
             }}
-            onClick={() => setShowCamera(true)}
+            onClick={() => {
+              instaRef.current.setPlayerDirection(1);
+              instaRef.current.play();
+              setTimeout(() => setShowCamera(true), 500);
+            }}
             className="cursor-pointer"
           >
             <Player
